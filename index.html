@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>素因数分解</title>
+<style>
+body {
+  margin: 0;
+  font-size: 12pt;
+}
+
+.box {
+  width: 85%;
+  margin: 16px auto;
+}
+
+h1 {
+  text-align:center;
+  font-size: 2em;
+}
+
+.ans {
+    max-width: 320px;
+    margin-bottom: 7px;
+    border: 2px solid #d0d0d0;
+    border-radius: 5px;
+}
+
+.ans summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 1em 2em;
+    color: #333333;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ans summary::-webkit-details-marker {
+    display: none;
+}
+
+.ans summary::after {
+    transform: translateY(-25%) rotate(45deg);
+    width: 7px;
+    height: 7px;
+    margin-left: 10px;
+    border-bottom: 3px solid #333333b3;
+    border-right: 3px solid #333333b3;
+    content: '';
+    transition: transform .3s;
+}
+
+.ans[open] summary::after {
+    transform: rotate(225deg);
+}
+
+.ans p {
+    transform: translateY(-10px);
+    opacity: 0;
+    margin: 0;
+    padding: .3em 2em 1.5em;
+    color: #333333;
+    transition: transform .5s, opacity .5s;
+}
+
+.ans[open] p {
+    transform: none;
+    opacity: 1;
+}
+
+.opt_box {
+    max-width: 320px;
+    margin-bottom: 7px;
+    font-size: 0.8em;
+    text-align: center;
+}
+
+.que_box {
+    max-width: 320px;
+    margin-bottom: 7px;
+    border: 2px solid #d0d0d0;
+    border-radius: 5px;
+    text-align: center;
+}
+.que_box p {
+    max-height: 160px;
+    font-size: 32pt;
+    font-weight: 600;
+    line-height: 0em;
+}
+
+</style>
+<script>
+const bunkai = (n) => {
+  if (!Number.isInteger(n) || n < 2) {
+    throw new ValueError(`'${n}' は２以上の自然数でないとダメ`);
+  }
+  const ans = [];
+  let p = 2;
+  let tmp = n;
+  while (p * p <= tmp) {
+    while (tmp % p === 0) {
+      ans.push( p );
+      tmp /= p;
+    }
+    p += 1;
+  }
+  if (tmp > 1) {
+    ans.push( tmp );
+  }
+  return ans;
+}
+
+const EASY   = 0;
+const NORMAL = 1;
+const MEDIUM = 2;
+const HEAVY  = 3;
+const STRONG = 4;
+const get_pmax = (pmax) => {
+  switch (pmax) {
+    case EASY  : return 19;
+    case NORMAL: return 37;
+    case MEDIUM: return 51;
+    case HEAVY:  return 97;
+    case STRONG: return 199;
+    default: throw new Error(`pmax = ${pmax}`);
+  }
+};
+
+const get_quest = (pval=NORMAL, keta3=true) => {
+  const min = keta3? 100: 1000;
+  const max = keta3? 999: 9999;
+  const sa = max - min + 1;
+  const pmax = get_pmax(pval);
+
+  while (true) {
+    const r = Math.trunc(Math.random() * sa) + min;
+    const p = bunkai( r );
+    if (!p.some(x => x > pmax)) {
+      return { que: r, ans: p };
+    }
+  }
+};
+
+window.onload = () => {
+  const but = document.getElementById("gen_but");
+  but.addEventListener("click", ()=>{
+    const ans = document.getElementById("ans_lst");
+    const keta = document.getElementById("keta").value === '1';
+    const pval = parseInt(document.getElementById("pmax").value);
+    const que = get_quest(pval, keta);
+    //ans.removeAttribute('open');
+    document.getElementById("quest").innerText = que.que;
+    ans.innerText = `${que.que} = [${que.ans}]`;
+  });
+};
+
+</script>
+  </head>
+  <body>
+    <div class="box">
+      <h1>素因数分解</h1>
+      <div class="que_box">
+        <p id="quest">????</p>
+      </div>
+      <div class="opt_box">
+        <label for="keta">桁数: </label>
+        <select id="keta">
+          <option value="1" selected>100-999</option>
+          <option value="0">1000-9999</option>
+        </select>
+        <label for="pmax">Lv: </label>
+        <select id="pmax">
+          <option value="0">EASY(19)</option>
+          <option value="1" selected>NORMAL(37)</option>
+          <option value="2">MEDIUM(51)</option>
+          <option value="3">HEAVY(97)</option>
+          <option value="4">STRONG(199)</option>
+        </select>
+        <button id="gen_but">GEN</button>
+      </div>
+      <details class="ans">
+          <summary>解答を見る</summary>
+          <p id="ans_lst">???? = []</p>
+      </details>
+      <details class="ans">
+        <summary>200までの素数一覧</summary>
+        <p>2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199</p>
+      </details>
+    </div>
+  </body>
+</html>
+
